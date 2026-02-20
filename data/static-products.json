@@ -1,0 +1,52 @@
+[
+  {
+    "id": "74882a7f-8fb2-4f1b-ae1d-38e6f7b9f35d",
+    "title": "Smart Leads Finder 🔥",
+    "description": "A Smart Lead Generation Tool - Find, Audit, and Win\nWebsite Development Projects - ",
+    "image_url": "https://fiezadmlmidsuzdqujvh.supabase.co/storage/v1/object/public/product-images/1767538793893-xbht5po6lbb.png",
+    "button_url": "https://lead-finder.base44.app/",
+    "is_featured": true,
+    "created_at": "2026-01-04T15:01:18.964657+00:00",
+    "updated_at": "2026-01-04T15:01:18.964657+00:00"
+  },
+  {
+    "id": "2131f743-a3b3-4d23-958b-9a60d78f7096",
+    "title": "Smart URL Shortener Free",
+    "description": "Transform long, unwieldy URLs into clean, shareable links. No sign-up required. Free forever.",
+    "image_url": "https://fiezadmlmidsuzdqujvh.supabase.co/storage/v1/object/public/product-images/1767538639162-btcriqnbrl.png",
+    "button_url": "https://url-shortener.base44.app/",
+    "is_featured": true,
+    "created_at": "2026-01-04T14:57:39.879669+00:00",
+    "updated_at": "2026-01-04T14:57:39.879669+00:00"
+  },
+  {
+    "id": "fccd1aa0-ec71-46e8-b1d0-da79401d0962",
+    "title": "কুরআন-হাদিস ইনসাইট ও গভেষণা",
+    "description": "সহজে কুরআন এবং হাদীস পড়ুন এবং শিখুন\n",
+    "image_url": "https://fiezadmlmidsuzdqujvh.supabase.co/storage/v1/object/public/product-images/1767533151675-1o6yjr4csmbh.png",
+    "button_url": "https://quran-hadith.lovable.app/",
+    "is_featured": true,
+    "created_at": "2026-01-04T13:26:14.465138+00:00",
+    "updated_at": "2026-01-04T13:26:14.465138+00:00"
+  },
+  {
+    "id": "1c1dcc9b-36aa-482b-9fa1-3b4e6ebd7557",
+    "title": "Gemini Watermark Remover",
+    "description": "Remove Gemini-generated images Watermarks with just 1 click",
+    "image_url": "https://fiezadmlmidsuzdqujvh.supabase.co/storage/v1/object/public/product-images/1767532903756-t5qn18a097.png",
+    "button_url": "https://geminiwatermarkremover.lovable.app/",
+    "is_featured": true,
+    "created_at": "2026-01-04T13:22:10.418154+00:00",
+    "updated_at": "2026-01-04T13:22:10.418154+00:00"
+  },
+  {
+    "id": "7d22b6d1-5126-433a-950d-d8200dbc02ac",
+    "title": "Keyword Researcher ",
+    "description": "Discover high-performing keywords, analyze search volumes, and dominate search rankings with our advanced AI-powered tools.",
+    "image_url": "https://fiezadmlmidsuzdqujvh.supabase.co/storage/v1/object/public/product-images/1767532346848-03dso6nzgafg.png",
+    "button_url": "https://keywordresearcher.lovable.app/",
+    "is_featured": true,
+    "created_at": "2026-01-04T13:13:01.552413+00:00",
+    "updated_at": "2026-01-04T13:13:01.552413+00:00"
+  }
+]
