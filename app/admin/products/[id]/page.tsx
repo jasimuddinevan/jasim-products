@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { getProduct, updateProduct } from '@/lib/products';
+import { refreshProductCache } from '@/lib/refresh-product-cache';
 import type { Product } from '@/types/database';
 
 interface FormData {
@@ -123,6 +124,7 @@ export default function EditProductPage() {
       const product = await updateProduct(productId, formData);
 
       if (product) {
+        refreshProductCache();
         router.push('/admin/products');
       } else {
         setErrors({ title: 'Failed to update product. Please try again.' });

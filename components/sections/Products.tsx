@@ -1,15 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { ProductCard } from '@/components/products/ProductCard';
-import type { Product } from '@/types/database';
+import { useProducts } from '@/hooks/use-products';
 
-interface ProductsProps {
-  products: Product[];
-}
+export function Products() {
+  const { products, isLoading, fromCache } = useProducts();
 
-export function Products({ products }: ProductsProps) {
   return (
     <section id="products" className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,22 +38,30 @@ export function Products({ products }: ProductsProps) {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {products.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
 
-        {products.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <p className="text-slate-500 dark:text-slate-400">
-              No products yet. Check back soon!
-            </p>
-          </motion.div>
+            {products.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16"
+              >
+                <p className="text-slate-500 dark:text-slate-400">
+                  No products yet. Check back soon!
+                </p>
+              </motion.div>
+            )}
+          </>
         )}
       </div>
     </section>

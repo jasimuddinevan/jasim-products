@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { createProduct } from '@/lib/products';
+import { refreshProductCache } from '@/lib/refresh-product-cache';
 
 interface FormData {
   title: string;
@@ -87,6 +88,7 @@ export default function NewProductPage() {
       const product = await createProduct(formData);
 
       if (product) {
+        refreshProductCache();
         router.push('/admin/products');
       } else {
         setErrors({ title: 'Failed to create product. Please try again.' });
