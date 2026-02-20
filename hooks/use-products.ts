@@ -2,18 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import type { Product } from '@/types/database';
-import { getCachedProducts, setCachedProducts } from '@/lib/product-cache';
 
 interface UseProductsResult {
   products: Product[];
   isLoading: boolean;
-  fromCache: boolean;
+  source: string;
 }
 
 export function useProducts(): UseProductsResult {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [fromCache, setFromCache] = useState(false);
+  const [source, setSource] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -24,21 +23,13 @@ export function useProducts(): UseProductsResult {
         const data = await res.json();
 
         if (!cancelled) {
-          if (res.ok && data.products?.length > 0) {
-            setProducts(data.products);
-            setCachedProducts(data.products);
-            setFromCache(false);
-          } else {
-            const cached = getCachedProducts();
-            setProducts(cached);
-            setFromCache(cached.length > 0);
-          }
+          setProducts(data.products || []);
+          setSource(data.source || 'unknown');
         }
       } catch {
         if (!cancelled) {
-          const cached = getCachedProducts();
-          setProducts(cached);
-          setFromCache(cached.length > 0);
+          setProducts([]);
+          setSource('error');
         }
       } finally {
         if (!cancelled) {
@@ -54,5 +45,5 @@ export function useProducts(): UseProductsResult {
     };
   }, []);
 
-  return { products, isLoading, fromCache };
+  return { products, isLoading, source };
 }

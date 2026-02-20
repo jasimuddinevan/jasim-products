@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { getSupabase } from '@/lib/supabase';
 import { deleteProduct } from '@/lib/products';
-import { refreshProductCache } from '@/lib/refresh-product-cache';
+import { triggerProductSync } from '@/lib/sync-products';
 import type { Product } from '@/types/database';
 
 type FilterType = 'all' | 'featured';
@@ -89,7 +89,7 @@ export default function AdminProductsPage() {
 
     if (success) {
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
-      refreshProductCache();
+      triggerProductSync();
     }
 
     setDeleteTarget(null);

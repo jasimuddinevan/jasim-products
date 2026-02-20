@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
-import { readStaticProducts, writeStaticProducts } from '@/lib/static-products';
+import { writeStaticProducts } from '@/lib/static-products';
 import type { Product } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-async function syncFromDatabase(): Promise<Product[] | null> {
+export async function POST() {
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
@@ -15,29 +15,25 @@ async function syncFromDatabase(): Promise<Product[] | null> {
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false });
 
-    if (error) return null;
+    if (error) {
+      return NextResponse.json(
+        { synced: false, error: error.message },
+        { status: 502 }
+      );
+    }
 
     const products = (data as Product[]) || [];
     writeStaticProducts(products);
-    return products;
-  } catch {
-    return null;
-  }
-}
 
-export async function GET() {
-  const products = await syncFromDatabase();
-
-  if (products !== null) {
     return NextResponse.json({
-      products,
-      source: 'database',
+      synced: true,
+      count: products.length,
+      timestamp: new Date().toISOString(),
     });
+  } catch {
+    return NextResponse.json(
+      { synced: false, error: 'Sync failed' },
+      { status: 500 }
+    );
   }
-
-  const snapshot = readStaticProducts();
-  return NextResponse.json({
-    products: snapshot,
-    source: 'snapshot',
-  });
 }

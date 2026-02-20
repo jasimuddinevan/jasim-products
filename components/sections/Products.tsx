@@ -6,7 +6,7 @@ import { ProductCard } from '@/components/products/ProductCard';
 import { useProducts } from '@/hooks/use-products';
 
 export function Products() {
-  const { products, isLoading, fromCache } = useProducts();
+  const { products, isLoading } = useProducts();
 
   return (
     <section id="products" className="relative py-24 sm:py-32">
