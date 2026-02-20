@@ -1,4 +1,5 @@
-import { getSupabase } from './supabase';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 const ADMIN_SESSION_KEY = 'jasim_space_admin_session';
 
@@ -13,25 +14,23 @@ export async function validateAdminCredentials(
   password: string
 ): Promise<boolean> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('email', email.trim().toLowerCase())
-      .eq('password_hash', password)
-      .maybeSingle();
+    const res = await fetch(`${supabaseUrl}/functions/v1/manage-admin`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'login',
+        email: email.trim().toLowerCase(),
+        password,
+      }),
+    });
 
-    if (error) {
-      console.error('Admin login error:', error);
-      return false;
-    }
+    if (!res.ok) return false;
 
-    if (!data) {
-      console.error('No matching admin user found');
-      return false;
-    }
-
-    return true;
+    const data = await res.json();
+    return data.success === true;
   } catch (err) {
     console.error('Admin validation exception:', err);
     return false;

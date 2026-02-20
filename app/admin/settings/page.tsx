@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -69,33 +68,30 @@ export default function AdminSettingsPage() {
     setIsUpdatingEmail(true);
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey);
+      const adminSession = JSON.stringify({
+        email: session.email,
+        isAuthenticated: session.isAuthenticated,
+        expiresAt: session.expiresAt,
+      });
 
-      const { data: currentUser } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', session.email)
-        .maybeSingle();
+      const res = await fetch(`${supabaseUrl}/functions/v1/manage-admin`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          'x-admin-session': adminSession,
+        },
+        body: JSON.stringify({
+          action: 'update-email',
+          currentPassword,
+          newEmail: email,
+        }),
+      });
 
-      if (!currentUser) {
-        setEmailError('User not found');
-        setIsUpdatingEmail(false);
-        return;
-      }
+      const data = await res.json();
 
-      if (currentUser.password_hash !== currentPassword) {
-        setEmailError('Current password is incorrect');
-        setIsUpdatingEmail(false);
-        return;
-      }
-
-      const { error } = await supabase
-        .from('admin_users')
-        .update({ email: email.trim().toLowerCase() })
-        .eq('id', currentUser.id);
-
-      if (error) {
-        setEmailError('Failed to update email');
+      if (!res.ok) {
+        setEmailError(data.error || 'Failed to update email');
         return;
       }
 
@@ -134,27 +130,29 @@ export default function AdminSettingsPage() {
     setIsUpdatingPassword(true);
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey);
+      const adminSession = JSON.stringify({
+        email: session.email,
+        isAuthenticated: session.isAuthenticated,
+        expiresAt: session.expiresAt,
+      });
 
-      const { data: currentUser } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', session.email)
-        .maybeSingle();
+      const res = await fetch(`${supabaseUrl}/functions/v1/manage-admin`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          'x-admin-session': adminSession,
+        },
+        body: JSON.stringify({
+          action: 'update-password',
+          newPassword,
+        }),
+      });
 
-      if (!currentUser) {
-        setPasswordError('User not found');
-        setIsUpdatingPassword(false);
-        return;
-      }
+      const data = await res.json();
 
-      const { error } = await supabase
-        .from('admin_users')
-        .update({ password_hash: newPassword })
-        .eq('id', currentUser.id);
-
-      if (error) {
-        setPasswordError('Failed to update password');
+      if (!res.ok) {
+        setPasswordError(data.error || 'Failed to update password');
         return;
       }
 

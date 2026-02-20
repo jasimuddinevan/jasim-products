@@ -1,16 +1,33 @@
 import { getSupabase } from './supabase';
-import { createClient } from '@supabase/supabase-js';
+import { getAdminSession } from './admin-auth';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/database';
 
-function getAdminSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fiezadmlmidsuzdqujvh.supabase.co';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZXphZG1sbWlkc3V6ZHF1anZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4MDU4NDMsImV4cCI6MjA4MjM4MTg0M30.v4baJOTB30hLKXIdHxVKyB3l7SBusf-sy6m8J_tqTSw';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  return createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+function getSessionHeader(): string {
+  const session = getAdminSession();
+  if (!session) return '';
+  return JSON.stringify({
+    email: session.email,
+    isAuthenticated: session.isAuthenticated,
+    expiresAt: session.expiresAt,
+  });
+}
+
+async function edgeFetch(method: string, body: unknown, productId?: string): Promise<Response> {
+  const url = productId
+    ? `${supabaseUrl}/functions/v1/manage-products/${productId}`
+    : `${supabaseUrl}/functions/v1/manage-products`;
+
+  return fetch(url, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${supabaseAnonKey}`,
+      'Content-Type': 'application/json',
+      'x-admin-session': getSessionHeader(),
     },
+    body: JSON.stringify(body),
   });
 }
 
@@ -60,20 +77,9 @@ export async function createProduct(
   product: ProductInsert
 ): Promise<Product | null> {
   try {
-    const supabase = getAdminSupabase();
-
-    const { data, error } = await supabase
-      .from('products')
-      .insert(product)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating product:', error);
-      return null;
-    }
-
-    return data as Product;
+    const res = await edgeFetch('POST', product);
+    if (!res.ok) return null;
+    return (await res.json()) as Product;
   } catch (error) {
     console.error('Error creating product:', error);
     return null;
@@ -85,21 +91,9 @@ export async function updateProduct(
   updates: ProductUpdate
 ): Promise<Product | null> {
   try {
-    const supabase = getAdminSupabase();
-
-    const { data, error } = await supabase
-      .from('products')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating product:', error);
-      return null;
-    }
-
-    return data as Product;
+    const res = await edgeFetch('PUT', updates, id);
+    if (!res.ok) return null;
+    return (await res.json()) as Product;
   } catch (error) {
     console.error('Error updating product:', error);
     return null;
@@ -108,19 +102,8 @@ export async function updateProduct(
 
 export async function deleteProduct(id: string): Promise<boolean> {
   try {
-    const supabase = getAdminSupabase();
-
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting product:', error);
-      return false;
-    }
-
-    return true;
+    const res = await edgeFetch('DELETE', {}, id);
+    return res.ok;
   } catch (error) {
     console.error('Error deleting product:', error);
     return false;
